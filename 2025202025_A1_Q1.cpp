@@ -35,7 +35,7 @@ void Block_revarsal(int fd, long long block_size, const char* file_name)
     long long no_of_bytes_read = 0;
 
     long long bytes_remaining = end_pt;
-    int fd_op = open((string("Assignment1/0_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+    int fd_op = open((string("Assignment1/0_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
     if(fd_op == -1)
     {
         perror("Invalid Path Name For The Output File.");
@@ -73,7 +73,7 @@ void Full_revarsal(int fd, const char* file_name)
     long long block_size = 4;//1024*1024;
     char buffer[block_size];
     long long end_pt = lseek(fd, 0, SEEK_END);
-    int fd_op = open((string("Assignment1/1_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+    int fd_op = open((string("Assignment1/1_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
     if(fd_op == -1)
     {
         perror("Invalid Path Name For The Output File.");
@@ -121,7 +121,7 @@ void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char
     long long block_size = 4;//1024*1024;
     char buffer[block_size];
     long long end_pt = lseek(fd, 0, SEEK_END);
-    int fd_op = open((string("Assignment1/2_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
+    int fd_op = open((string("Assignment1/2_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
     if(fd_op == -1)
     {
         perror("Invalid Path Name For The Output File.");
@@ -162,7 +162,7 @@ void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char
     long long part2 = add_arg2-add_arg1 +1;
     while(part2>0)
     {
-        long long percentage = ((add_arg2+1 - part2)*100)/end_pt;
+        long long percentage = ((add_arg1+1 - part2)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
         write(1, progress_bar, strlen(progress_bar));
         fflush(stdout);

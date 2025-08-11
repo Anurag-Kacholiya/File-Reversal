@@ -3,10 +3,127 @@
 #include<string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <stdexcept>
+#include <vector>
+
 #include <iostream>
 
 using namespace std;
+
+
+
+
+void permission_print(bool is_dir, bool is_verified, bool is_size_same, vector<bool> oldfile, vector<bool> newfile, vector<bool> dir)
+{
+    write(1, "Directory is created: ", strlen("Directory is created: "));
+    is_dir ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+    write(1, "Whether file contents are correctly processed: ", strlen("Whether file contents are correctly processed: "));
+    is_verified ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+    write(1, "Both Files Sizes are Same: ", strlen("Both Files Sizes are Same: "));
+    is_size_same ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+    
+    //old file permissions
+    string who;
+    int ch_field = 0;
+    for(int i = 0; i<9; i++)
+    {
+        if(ch_field == 0)
+            who = "User";
+        else if(ch_field == 1)
+            who = "Group";
+        else
+            who = "Others";
+
+        string read = who + " has read permissions on oldfile: ";
+        write(1, read.c_str(), read.size());
+        oldfile[i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string write_ = who + " has write permissions on oldfile: ";
+        write(1, write_.c_str(), write_.size());
+        oldfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string execute = who + " has execute permissions on oldfile: ";
+        write(1, execute.c_str(), execute.size());
+        oldfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        ch_field++;
+    }
+
+    //new file
+    ch_field = 0;
+    for(int i = 0; i<9; i++)
+    {
+        if(ch_field == 0)
+            who = "User";
+        else if(ch_field == 1)
+            who = "Group";
+        else
+            who = "Others";
+
+        string read = who + " has read permissions on newfile: ";
+        write(1, read.c_str(), read.size());
+        newfile[i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string write_ = who + " has write permissions on newfile: ";
+        write(1, write_.c_str(), write_.size());
+        newfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string execute = who + " has execute permissions on newfile: ";
+        write(1, execute.c_str(), execute.size());
+        newfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        ch_field++;
+    }
+
+
+    //dir
+    ch_field = 0;
+    for(int i = 0; i<9; i++)
+    {
+        if(ch_field == 0)
+            who = "User";
+        else if(ch_field == 1)
+            who = "Group";
+        else
+            who = "Others";
+
+        string read = who + " has read permissions on directory: ";
+        write(1, read.c_str(), read.size());
+        dir[i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string write_ = who + " has write permissions on directory: ";
+        write(1, write_.c_str(), write_.size());
+        dir[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string execute = who + " has execute permissions on directory: ";
+        write(1, execute.c_str(), execute.size());
+        dir[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        ch_field++;
+    }
+}
+
+vector<bool> permissions(struct stat file)
+{
+    bool user_read = file.st_mode & S_IRUSR;
+    bool user_write = file.st_mode & S_IWUSR;
+    bool user_execute = file.st_mode & S_IXUSR;
+    
+    bool group_read = file.st_mode & S_IRGRP;
+    bool group_write = file.st_mode & S_IWGRP;
+    bool group_execute = file.st_mode & S_IXGRP;
+    
+    bool other_read = file.st_mode & S_IROTH;
+    bool other_write = file.st_mode & S_IWOTH;
+    bool other_execute = file.st_mode & S_IXOTH;
+    
+    vector<bool> all_permissions = {user_read, user_write, user_execute, group_read, group_write, group_execute, other_read, other_write, other_execute};
+    return all_permissions;
+    
+}
+
+
 
 bool reversal_logic_check(char arr1[], char arr2[], long long end)
 {
@@ -236,13 +353,22 @@ int main(int args, const char* arguments[])
         perror("Wrong flag entered.");
     }
 
+    struct stat ip;
+    struct stat op;
+    struct stat dir;
+    
+    stat(input_file_name, &ip);
+    stat(output_file_name, &op);
+    
+    bool is_dir = (stat(dir_name, &dir) == 0);
+    bool sizes = (ip.st_size == op.st_size);
+    vector<bool> ip_per = permissions(ip);
+    vector<bool> op_per = permissions(op);
+    vector<bool> dir_per = permissions(dir);
+    
+    permission_print(is_dir, file_verification, sizes, ip_per, op_per, dir_per);
 
-    cout<<"are the files correctly verified : ";
-    if(file_verification == true)
-        cout<<"yes"<<endl;
-    else
-        cout<<"no"<<endl;
-
+    
 
     close(fd_op);
     close(fd_ip);
