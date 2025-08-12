@@ -10,8 +10,9 @@ const char* dir_name = "Assignment1/";
 
 using namespace std;
 
-void revarsal_logic(char buffer[], long long left_pt, long long right_pt)
+void reversal_logic(char buffer[], long long left_pt, long long right_pt)
 {
+    //this function performs reversal of any give array with start and end index inplace with help of swapping logic.
     while(left_pt <= right_pt)
     {
         char temp = buffer[left_pt];
@@ -22,134 +23,224 @@ void revarsal_logic(char buffer[], long long left_pt, long long right_pt)
     }
 }
 
-void Block_revarsal(int fd, long long block_size, const char* file_name)
+void Block_reversal(int fd, long long block_size, const char* file_name)
 {
+    //this function performs and contains the full logic of flag 0 i.e. block wise reversal.
     if(block_size == 0)
     {
         perror("Wrong Block size entered.");
         return;
     }
+
+    //initializing all necessary variables.
     char buffer[block_size];
     long long end_pt = lseek(fd, 0, SEEK_END);
     lseek(fd, 0, SEEK_SET);
     long long no_of_bytes_read = 0;
-
     long long bytes_remaining = end_pt;
+    char progress_bar[44];
+
+    //creating / opening output file.
     int fd_op = open((string("Assignment1/0_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
     if(fd_op == -1)
     {
-        perror("Invalid Path Name For The Output File.");
+        perror("Error in creating output file.");
         return;
     }
-    char progress_bar[30];
+    
+    //logic of block reversal and processbar.
     while(bytes_remaining > 0)
     {
+        //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((end_pt - bytes_remaining)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        write(1, progress_bar, strlen(progress_bar));
+        if (write(1, progress_bar, strlen(progress_bar)) == -1) {
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
         fflush(stdout);
-        usleep(100);
+
+        //reading block by block from start to EOF of the file.
         bytes_remaining -= block_size;
         no_of_bytes_read = read(fd, buffer, block_size);
-        revarsal_logic(buffer, 0LL , no_of_bytes_read-1);
-        write(fd_op, buffer, no_of_bytes_read);
+        if(no_of_bytes_read == -1){
+            perror("unable to perform read function.");
+            close(fd_op);
+        }
+        reversal_logic(buffer, 0LL , no_of_bytes_read-1);
+        if(write(fd_op, buffer, no_of_bytes_read)){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
+
+        //just for the edge case of last iteration we need to print the progressbar for the last iteration as if we don't do it here then it will not be printed.
         if(bytes_remaining<=0)
         {
-            percentage = 100;
+            percentage = ((end_pt - 0)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            write(1, progress_bar, strlen(progress_bar));
+            if(write(1, progress_bar, strlen(progress_bar))){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
             fflush(stdout);
-            write(1, "\n", 1);
+            if(write(1, "\n", 1)){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
         }
     }
    
-    // processing percentage bar will come here.
-    close(fd_op);
+    // closing the output file.
+    close(fd_op);   
 }
 
 
-void Full_revarsal(int fd, const char* file_name)
+void Full_reversal(int fd, const char* file_name)
 {
+    //this function performs and contains the full logic of flag 1 i.e. Full file reversal.
+
+    //initializing all necessary variables.
     long long block_size = 1024*1024;
     char buffer[block_size];
     long long end_pt = lseek(fd, 0, SEEK_END);
+    long long bytes_remaining = end_pt;
+    long long no_of_bytes_read = 0;
+    char progress_bar[44];
+
+    //creating / opening output file.
     int fd_op = open((string("Assignment1/1_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
     if(fd_op == -1)
     {
-        perror("Invalid Path Name For The Output File.");
+        perror("Error in creating output file.");
         return;
     }
-    long long bytes_remaining = end_pt;
-    long long no_of_bytes_read = 0;
-    char progress_bar[30];
+    
+    //logic of full file reversal and processbar.
     while(bytes_remaining>0)
     {
+        //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((end_pt - bytes_remaining)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        write(1, progress_bar, strlen(progress_bar));
+        if(write(1, progress_bar, strlen(progress_bar))){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
         fflush(stdout);
-        usleep(100);
+        
+        //assuming there are n blocks in the file of the defined block size above.
+        //we are reversing the (n-i)th block in every iteration i.e. from the end block by block.
         bytes_remaining -= block_size;
         lseek(fd, max(bytes_remaining, 0LL), SEEK_SET);
-        no_of_bytes_read = read(fd, buffer, min(block_size, block_size+bytes_remaining));
-        revarsal_logic(buffer, 0LL, no_of_bytes_read-1);
-        write(fd_op, buffer, no_of_bytes_read);
+        no_of_bytes_read = read(fd, buffer, min(block_size, block_size+bytes_remaining));  
+        if(no_of_bytes_read == -1){
+            perror("unable to perform read function.");
+            close(fd_op);
+        }
+        reversal_logic(buffer, 0LL, no_of_bytes_read-1);
+        if(write(fd_op, buffer, no_of_bytes_read)){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }     
 
         if(bytes_remaining<=0)
         {
-            percentage = 100;
+            percentage = ((end_pt-0)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            write(1, progress_bar, strlen(progress_bar));
+            if(write(1, progress_bar, strlen(progress_bar))){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
             fflush(stdout);
-            write(1, "\n", 1);
+            if(write(1, "\n", 1)){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
         }
     }
 
 
-    //processing bar will come here.
     close(fd_op);
 }
 
 
-void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char* file_name)
+void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char* file_name)
 {
+    //this function performs and contains the full logic of flag 1 i.e. Full file reversal.
     if(add_arg1>add_arg2)
     {
         perror("Wrong starting or ending index entered. start index can't be more than end Index");
         return;
     }
+
+    //initializing all necessary variables.
     long long block_size = 1024*1024;
     char buffer[block_size];
+    long long no_of_bytes_read = 0;
+    long long part1 = add_arg1;
+    char progress_bar[44];
     long long end_pt = lseek(fd, 0, SEEK_END);
+    
+    if(add_arg1 < 0 ||  add_arg2>end_pt )
+    {//condition when the input indices are out of bound.
+        perror("Wrong starting or ending index entered. Index is Out Of Bound.");
+        return;
+    }
+
+    //creating / opening output file.
     int fd_op = open((string("Assignment1/2_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
     if(fd_op == -1)
     {
-        perror("Invalid Path Name For The Output File.");
+        perror("Error in creating output file.");
         return;
     }
-    long long no_of_bytes_read = 0;
+    
 
     //and there are 3 diff parts which need to be processed 
-    //1st is revarsal from 0 to add_arg1-1 
-    long long part1 = add_arg1;
-    char progress_bar[30];
+    //1st is revarsel from 0 to add_arg1-1 
+    //logic is same as full reversal.
     while(part1>0)
     {
+        //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((add_arg1-part1)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        write(1, progress_bar, strlen(progress_bar));
+        if(write(1, progress_bar, strlen(progress_bar))){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
         fflush(stdout);
-        usleep(100000);
+        
         part1 -= block_size;
         lseek(fd, max(part1, 0LL), SEEK_SET);
         no_of_bytes_read = read(fd, buffer, min(block_size, block_size+part1));
-        revarsal_logic(buffer, 0LL, no_of_bytes_read-1);
-        write(fd_op, buffer, no_of_bytes_read);
+        if(no_of_bytes_read == -1){
+            perror("unable to perform read function.");
+            close(fd_op);
+        }
+        reversal_logic(buffer, 0LL, no_of_bytes_read-1);
+        if(write(fd_op, buffer, no_of_bytes_read)){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
+
         if(part1<0)
         {
             percentage = ((add_arg1)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            write(1, progress_bar, strlen(progress_bar));
+            if(write(1, progress_bar, strlen(progress_bar))){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
             fflush(stdout);
 
         }
@@ -162,63 +253,110 @@ void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char
     long long part2 = add_arg2-add_arg1 +1;
     while(part2>0)
     {
+        //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((add_arg2+1 - part2)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        write(1, progress_bar, strlen(progress_bar));
+        if(write(1, progress_bar, strlen(progress_bar))){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
         fflush(stdout);
-        usleep(100);
+
         part2 -= block_size;
         no_of_bytes_read = read(fd, buffer, min(block_size, block_size+part2));
-        write(fd_op, buffer, no_of_bytes_read);
+        if(no_of_bytes_read == -1){
+            perror("unable to perform read function.");
+            close(fd_op);
+        }
+        if(write(fd_op, buffer, no_of_bytes_read)){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
+
         if(part2<0)
         {
             percentage = ((add_arg2)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            write(1, progress_bar, strlen(progress_bar));
+            if(write(1, progress_bar, strlen(progress_bar))){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
             fflush(stdout);
             
         }
     }
     
 
-    //3rd is revarsal from add_arg2+1 to end_pt
+    //3rd is reversal from add_arg2+1 to end_pt
+    //logic is same as full reversal.
     long long part3 = (end_pt-1)-add_arg2;
     no_of_bytes_read = 0;
     while(part3>0)
     {
+        //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((end_pt-1 - part3)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        write(1, progress_bar, strlen(progress_bar));
+        if(write(1, progress_bar, strlen(progress_bar))){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
         fflush(stdout);
-        usleep(100);
+        
         part3 -= block_size;
         lseek(fd, add_arg2+max(part3, 0LL)+1, SEEK_SET);
         no_of_bytes_read = read(fd, buffer, min(block_size, block_size+part3));
-        revarsal_logic(buffer, 0LL, no_of_bytes_read-1);
-        write(fd_op, buffer, no_of_bytes_read);
+        if(no_of_bytes_read == -1){
+            perror("unable to perform read function.");
+            close(fd_op);
+        }
+        reversal_logic(buffer, 0LL, no_of_bytes_read-1);
+        if(write(fd_op, buffer, no_of_bytes_read)){
+            perror("unable to perform write function.");
+            close(fd_op);
+            return;
+        }
+
         if(part3<0)
         {
-            percentage = 100;
+            percentage = ((end_pt-0)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            write(1, progress_bar, strlen(progress_bar));
+            if(write(1, progress_bar, strlen(progress_bar))){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
             fflush(stdout);
-            write(1, "\n", 1);
+            if(write(1, "\n", 1)){
+                perror("unable to perform write function.");
+                close(fd_op);
+                return;
+            }
         }
     }
     
 
-    //processing bar will come here
     close(fd_op);
 }
 
 
 int main(int args,const char* arguments[])
 {
-    if(args <3 || args >5)
+    //checking if the no. of arguments are within the range.
+    if(args <3)
     {
         perror("Less arguments passed then expected.");
         return 0;
     }
+    else if(args >5)
+    {
+        perror("More arguments passed then expected.");
+        return 0;
+    }
+
     //extracting all data from the input from the user like input file name, flag, block size, start and end index
     const char* file_name=arguments[1];
     int flag;
@@ -234,21 +372,21 @@ int main(int args,const char* arguments[])
         perror("Invalid flag entered.");
         return 0;
     }
+
     long long add_arg1;
     long long add_arg2;
-
     if(args == 4)
-    {
+    {//only 1 additional argument i.e. block size
         try{
             add_arg1=stoll(arguments[3]);
         }
         catch(invalid_argument e){
-            perror("Invalid Block Size");
+            perror("Block Size must be an Integer.");
             return 0;
         }
     }
     else if(args == 5)
-    {
+    {//2 additional arguments i.e. start index and end index.
         try{
             add_arg1=stoll(arguments[3]);
         }
@@ -266,8 +404,8 @@ int main(int args,const char* arguments[])
         }
     }
 
+    //creating / opening output file.
     int fd = open(file_name, O_RDWR);
-
     if(fd == -1)
     {
         perror("Invalid File Name Entered.");
@@ -276,20 +414,27 @@ int main(int args,const char* arguments[])
 
 
     //creating the directory.
-    int dir = mkdir(dir_name, 0700);
-    
+    mkdir(dir_name, 0700);
+    struct stat dir;
+    if(stat(dir_name, &dir) != 0)
+    {
+        perror("There was an error while creating directory for outputs.");
+        return 0;
+    }
 
+    //calling the functions as per flag requirements for file reversal.
     if(flag == 0)
-        Block_revarsal(fd, add_arg1, file_name);
+        Block_reversal(fd, add_arg1, file_name);
     else if(flag == 1)
-        Full_revarsal(fd, file_name);
+        Full_reversal(fd, file_name);
     else if(flag == 2)
-        Partial_revarsal(fd, add_arg1, add_arg2, file_name);
+        Partial_reversal(fd, add_arg1, add_arg2, file_name);
     else
     {
         perror("Wrong flag entered.");
-        close(fd);
     }
 
+    //closing the input file.
+    close(fd);
     return 0;
 }

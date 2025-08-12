@@ -14,6 +14,7 @@ using namespace std;
 
 void permission_print(bool is_dir, bool is_verified, bool is_size_same, vector<bool> oldfile, vector<bool> newfile, vector<bool> dir)
 {
+    //prints all the permissions as per the given format.
     write(1, "Directory is created: ", strlen("Directory is created: "));
     is_dir ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
 
@@ -106,6 +107,7 @@ void permission_print(bool is_dir, bool is_verified, bool is_size_same, vector<b
 
 vector<bool> permissions(struct stat file)
 {
+    //function to check and return all permissions for a given file.
     bool user_read = file.st_mode & S_IRUSR;
     bool user_write = file.st_mode & S_IWUSR;
     bool user_execute = file.st_mode & S_IXUSR;
@@ -127,6 +129,7 @@ vector<bool> permissions(struct stat file)
 
 bool reversal_logic_check(char arr1[], char arr2[], long long end)
 {
+    //main logic to check if the given two arrays contain the same characters just reversed from each other.
     int start = 0;
     while(start < end)
     {
@@ -140,6 +143,8 @@ bool reversal_logic_check(char arr1[], char arr2[], long long end)
 
 bool every_byte_same_check(char arr1[], char arr2[], long long end)
 {
+    //main logic to check if the given two arrays contain the same characters in the same order.
+    //exclusive for the middle part of flag 2.
     int start = 0;
     while(start < end)
     {
@@ -154,8 +159,10 @@ bool every_byte_same_check(char arr1[], char arr2[], long long end)
 
 
 
-bool Block_revarsal_check(int fd_op, int fd_ip, long long block_size)
+bool Block_reversal_check(int fd_op, int fd_ip, long long block_size)
 {
+    //logic to verify the output and input files for flag 0.
+    // takes data from 2 different files in 2 different buffers block wise (from start i.e. 0) to check if those data are reverse of each other.
     char buffer_input[block_size];
     char buffer_output[block_size];
     long long total_bytes_op = lseek(fd_op, 0, SEEK_END);
@@ -177,8 +184,10 @@ bool Block_revarsal_check(int fd_op, int fd_ip, long long block_size)
     return is_verified_correctly;
 }
 
-bool Full_revarsal_check(int fd_op, int fd_ip)
+bool Full_reversal_check(int fd_op, int fd_ip)
 {
+    //logic to verify the output and input files for flag 1.
+    // takes data from 2 different files in 2 different buffers block wise - one from start i.e. 0 and other from (n-i)th block from end to check if those data are reverse of each other.
     long long block_size = 1024*1024;
     char buffer_input[block_size];
     char buffer_output[block_size];
@@ -205,8 +214,10 @@ bool Full_revarsal_check(int fd_op, int fd_ip)
     return is_verified_correctly;
 }
 
-bool Partial_revarsal_check(int fd_op, int fd_ip, long long add_arg1, long long add_arg2)
+bool Partial_reversal_check(int fd_op, int fd_ip, long long add_arg1, long long add_arg2)
 {
+    //logic to verify the output and input files for flag 2.
+    // takes data from 2 different files in 2 different buffers block wise but works in 3 different parts which are commented below.
     if(add_arg1>add_arg2)
     {
         perror("Wrong starting or ending index entered. start index can't be more than end Index");
@@ -228,6 +239,7 @@ bool Partial_revarsal_check(int fd_op, int fd_ip, long long add_arg1, long long 
     lseek(fd_ip, 0, SEEK_SET);
 
     //1st part : from 0 to start index -1
+    //this part uses same logic as Full_reversal_check for the above given range.
     long long part1 = add_arg1;
     while(part1 > 0 && is_verified_correctly)
     {
@@ -239,6 +251,7 @@ bool Partial_revarsal_check(int fd_op, int fd_ip, long long add_arg1, long long 
     }
     
     //2nd part : from start index to end index
+    //this part just validates if the data is exactly same in same order. 
     lseek(fd_op, add_arg1, SEEK_SET);
     lseek(fd_ip, add_arg1, SEEK_SET);
     no_of_bytes_read = 0;
@@ -252,6 +265,7 @@ bool Partial_revarsal_check(int fd_op, int fd_ip, long long add_arg1, long long 
     }
 
     //3rd part : from end index to EOF
+    //this part uses same logic as Full_reversal_check for the above given range.
     long long part3 = (total_bytes_op-1)-add_arg2;
     no_of_bytes_read = 0;
     while(part3>0 && is_verified_correctly)
@@ -269,11 +283,19 @@ bool Partial_revarsal_check(int fd_op, int fd_ip, long long add_arg1, long long 
 
 int main(int args, const char* arguments[])
 {
-    if(args < 5 || args > 7)
+    //checking if the no. of arguments are within the range.
+    if(args < 5)
     {
         perror("Less arguments passed then expected.");
         return 0;
     }
+    if(args > 7)
+    {
+        perror("More arguments passed then expected.");
+        return 0;
+    }
+    
+    //extracting all data from the input from the user like input file name, flag, block size, start and end index
     const char* output_file_name = arguments[1];
     const char* input_file_name = arguments[2];
     const char* dir_name = arguments[3];
@@ -293,19 +315,18 @@ int main(int args, const char* arguments[])
 
     long long add_arg1;
     long long add_arg2;
-
     if(args == 6)
-    {
+    {//only 1 additional argument i.e. block size
         try{
             add_arg1=stoll(arguments[5]);
         }
         catch(invalid_argument e){
-            perror("Invalid Block Size");
+            perror("Block Size must be an Integer.");
             return 0;
         }
     }
     else if(args == 7)
-    {
+    {//2 additional arguments i.e. start index and end index.
         try{
             add_arg1=stoll(arguments[5]);
         }
@@ -323,16 +344,16 @@ int main(int args, const char* arguments[])
         }
     }
 
+    //creating / opening output file.
     int fd_op = open(output_file_name, O_RDWR);
-
     if(fd_op == -1)
     {
         perror("Invalid File Name Entered.");
         return 0;
     }
 
+    //creating / opening input file.
     int fd_ip = open(input_file_name, O_RDWR);
-
     if(fd_ip == -1)
     {
         perror("Invalid File Name Entered.");
@@ -340,36 +361,39 @@ int main(int args, const char* arguments[])
     }
     
 
+    //calling the functions as per flag requirements for file verification and storing values in boolean(true if verified else false).
     bool file_verification = false;
-
     if(flag == 0)
-        file_verification = Block_revarsal_check(fd_op, fd_ip, add_arg1);
+        file_verification = Block_reversal_check(fd_op, fd_ip, add_arg1);
     else if(flag == 1)
-        file_verification = Full_revarsal_check(fd_op, fd_ip);
+        file_verification = Full_reversal_check(fd_op, fd_ip);
     else if(flag == 2)
-        file_verification = Partial_revarsal_check(fd_op, fd_ip, add_arg1, add_arg2);
+        file_verification = Partial_reversal_check(fd_op, fd_ip, add_arg1, add_arg2);
     else
     {
         perror("Wrong flag entered.");
     }
 
-    struct stat ip;
-    struct stat op;
+    //using the stat system call features to get the access of all data of oldFile(input of Q1), newfile(output of Q1), and directory of outputs.
+    struct stat oldFile;
+    struct stat newFile;
     struct stat dir;
     
-    stat(input_file_name, &ip);
-    stat(output_file_name, &op);
+    stat(input_file_name, &oldFile);
+    stat(output_file_name, &newFile);
     
+    //retrieving the permissions.
     bool is_dir = (stat(dir_name, &dir) == 0);
-    bool sizes = (ip.st_size == op.st_size);
-    vector<bool> ip_per = permissions(ip);
-    vector<bool> op_per = permissions(op);
+    bool sizes = (oldFile.st_size == newFile.st_size);
+    vector<bool> ip_per = permissions(oldFile);
+    vector<bool> op_per = permissions(newFile);
     vector<bool> dir_per = permissions(dir);
     
+    //final printing of all the outputs in required format.
     permission_print(is_dir, file_verification, sizes, ip_per, op_per, dir_per);
 
     
-
+    //closing the newfile as well as old file.
     close(fd_op);
     close(fd_ip);
     return 0;
