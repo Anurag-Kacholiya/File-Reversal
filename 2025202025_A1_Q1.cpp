@@ -70,7 +70,7 @@ void Block_revarsal(int fd, long long block_size, const char* file_name)
 
 void Full_revarsal(int fd, const char* file_name)
 {
-    long long block_size = 4;//1024*1024;
+    long long block_size = 1024*1024;
     char buffer[block_size];
     long long end_pt = lseek(fd, 0, SEEK_END);
     int fd_op = open((string("Assignment1/1_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
@@ -118,7 +118,7 @@ void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char
         perror("Wrong starting or ending index entered. start index can't be more than end Index");
         return;
     }
-    long long block_size = 4;//1024*1024;
+    long long block_size = 1024*1024;
     char buffer[block_size];
     long long end_pt = lseek(fd, 0, SEEK_END);
     int fd_op = open((string("Assignment1/2_")+file_name).c_str(), O_WRONLY | O_APPEND | O_CREAT | O_TRUNC, 0600);
@@ -139,7 +139,7 @@ void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
         write(1, progress_bar, strlen(progress_bar));
         fflush(stdout);
-        usleep(100);
+        usleep(100000);
         part1 -= block_size;
         lseek(fd, max(part1, 0LL), SEEK_SET);
         no_of_bytes_read = read(fd, buffer, min(block_size, block_size+part1));
@@ -162,7 +162,7 @@ void Partial_revarsal(int fd, long long add_arg1, long long add_arg2, const char
     long long part2 = add_arg2-add_arg1 +1;
     while(part2>0)
     {
-        long long percentage = ((add_arg1+1 - part2)*100)/end_pt;
+        long long percentage = ((add_arg2+1 - part2)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
         write(1, progress_bar, strlen(progress_bar));
         fflush(stdout);

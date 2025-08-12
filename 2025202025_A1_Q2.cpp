@@ -93,7 +93,7 @@ void permission_print(bool is_dir, bool is_verified, bool is_size_same, vector<b
         dir[i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
 
         string write_ = who + " has write permissions on directory: ";
-        write(1, write_.c_str(), write_.size());
+        write(1, write_.c_str(), write_ .size());
         dir[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
 
         string execute = who + " has execute permissions on directory: ";
@@ -179,7 +179,7 @@ bool Block_revarsal_check(int fd_op, int fd_ip, long long block_size)
 
 bool Full_revarsal_check(int fd_op, int fd_ip)
 {
-    long long block_size = 4;//1024*1024;
+    long long block_size = 1024*1024;
     char buffer_input[block_size];
     char buffer_output[block_size];
     long long total_bytes_op = lseek(fd_op, 0, SEEK_END);
@@ -212,7 +212,7 @@ bool Partial_revarsal_check(int fd_op, int fd_ip, long long add_arg1, long long 
         perror("Wrong starting or ending index entered. start index can't be more than end Index");
         return false;
     }
-    long long block_size = 4;//1024*1024;
+    long long block_size = 1024*1024;
     char buffer_input[block_size];
     char buffer_output[block_size];
     long long total_bytes_op = lseek(fd_op, 0, SEEK_END);
