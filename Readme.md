@@ -135,13 +135,13 @@ following are the functions defined in the program:
 Workflow is as follows : 
 **In main function :**
 1) Arguments parsing - which extracts command-line arguments to identify input file, mode (flag), and any extra parameters.
-2) Directory Verification - Uses stat() to check if the given directory exists or not.
-3) Permission Check - Checks read, write, execute permission bits for user, group and others of newFile, oldFile and directory.
-4) File Size Match Check – Compares sizes of input and output files to detect obvious mismatches.
-5) File verification - Based on the flag and calling respective function.
+2) File verification - Based on the flag and calling respective function.
                        i.e. if flag = 0 -> Block_reversal_check(fd, block_size, file_name);
                             if flag = 1 -> Full_reversal_check(fd, file_name);
                             if flag = 2 -> Partial_reversal_check(fd, add_arg1, add_arg2, file_name);
+3) Directory Verification - Uses stat() to check if the given directory exists or not.
+4) Permission Check - Checks read, write, execute permission bits for user, group and others of oldFile, newFile and directory.
+5) File Size Match Check – Compares sizes of input and output files to detect obvious mismatches. 
 6) Final Verification Result – Prints whether verification succeeded or failed.
 
 **In Block_reversal_check function :**
@@ -163,6 +163,6 @@ Process three regions:
 3) End region (end_index + 1 → EOF) – Verify reversed content matches corresponding end segment from input.
 
 **In permissions function :**
-1) checks all permissions i.e. for user, group and other for oldFile, newFile and directory(which ever it is called for).
+1) checks all permissions i.e. for user, group and other for newFile, oldFile and directory(which ever it is called for).
 2) stores value in a vector<bool> of size 9 and returns it.
 ______________________________________________________________

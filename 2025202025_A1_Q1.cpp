@@ -69,7 +69,7 @@ void Block_reversal(int fd, long long block_size, const char* file_name)
             close(fd_op);
         }
         reversal_logic(buffer, 0LL , no_of_bytes_read-1);
-        if(write(fd_op, buffer, no_of_bytes_read)){
+        if(write(fd_op, buffer, no_of_bytes_read) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -80,13 +80,13 @@ void Block_reversal(int fd, long long block_size, const char* file_name)
         {
             percentage = ((end_pt - 0)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            if(write(1, progress_bar, strlen(progress_bar))){
+            if(write(1, progress_bar, strlen(progress_bar)) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
         }
             fflush(stdout);
-            if(write(1, "\n", 1)){
+            if(write(1, "\n", 1) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;
@@ -125,7 +125,7 @@ void Full_reversal(int fd, const char* file_name)
         //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((end_pt - bytes_remaining)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        if(write(1, progress_bar, strlen(progress_bar))){
+        if(write(1, progress_bar, strlen(progress_bar)) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -142,7 +142,7 @@ void Full_reversal(int fd, const char* file_name)
             close(fd_op);
         }
         reversal_logic(buffer, 0LL, no_of_bytes_read-1);
-        if(write(fd_op, buffer, no_of_bytes_read)){
+        if(write(fd_op, buffer, no_of_bytes_read)== -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -152,13 +152,13 @@ void Full_reversal(int fd, const char* file_name)
         {
             percentage = ((end_pt-0)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            if(write(1, progress_bar, strlen(progress_bar))){
+            if(write(1, progress_bar, strlen(progress_bar)) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;
             }
             fflush(stdout);
-            if(write(1, "\n", 1)){
+            if(write(1, "\n", 1) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;
@@ -211,7 +211,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
         //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((add_arg1-part1)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        if(write(1, progress_bar, strlen(progress_bar))){
+        if(write(1, progress_bar, strlen(progress_bar)) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -226,7 +226,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
             close(fd_op);
         }
         reversal_logic(buffer, 0LL, no_of_bytes_read-1);
-        if(write(fd_op, buffer, no_of_bytes_read)){
+        if(write(fd_op, buffer, no_of_bytes_read) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -236,7 +236,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
         {
             percentage = ((add_arg1)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            if(write(1, progress_bar, strlen(progress_bar))){
+            if(write(1, progress_bar, strlen(progress_bar)) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;
@@ -256,7 +256,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
         //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((add_arg2+1 - part2)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        if(write(1, progress_bar, strlen(progress_bar))){
+        if(write(1, progress_bar, strlen(progress_bar)) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -269,7 +269,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
             perror("unable to perform read function.");
             close(fd_op);
         }
-        if(write(fd_op, buffer, no_of_bytes_read)){
+        if(write(fd_op, buffer, no_of_bytes_read) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -279,7 +279,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
         {
             percentage = ((add_arg2)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            if(write(1, progress_bar, strlen(progress_bar))){
+            if(write(1, progress_bar, strlen(progress_bar)) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;
@@ -299,7 +299,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
         //calculating the percentage of file that is processed for process bar. and printing / overwriting processbar.
         long long percentage = ((end_pt-1 - part3)*100)/end_pt;
         snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-        if(write(1, progress_bar, strlen(progress_bar))){
+        if(write(1, progress_bar, strlen(progress_bar)) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -314,7 +314,7 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
             close(fd_op);
         }
         reversal_logic(buffer, 0LL, no_of_bytes_read-1);
-        if(write(fd_op, buffer, no_of_bytes_read)){
+        if(write(fd_op, buffer, no_of_bytes_read) == -1){
             perror("unable to perform write function.");
             close(fd_op);
             return;
@@ -324,13 +324,13 @@ void Partial_reversal(int fd, long long add_arg1, long long add_arg2, const char
         {
             percentage = ((end_pt-0)*100)/end_pt;
             snprintf(progress_bar, sizeof(progress_bar), "\rProgress : ( %lld%% / 100)", percentage);
-            if(write(1, progress_bar, strlen(progress_bar))){
+            if(write(1, progress_bar, strlen(progress_bar)) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;
             }
             fflush(stdout);
-            if(write(1, "\n", 1)){
+            if(write(1, "\n", 1) == -1){
                 perror("unable to perform write function.");
                 close(fd_op);
                 return;

@@ -24,35 +24,10 @@ void permission_print(bool is_dir, bool is_verified, bool is_size_same, vector<b
     write(1, "Both Files Sizes are Same: ", strlen("Both Files Sizes are Same: "));
     is_size_same ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
     
-    //old file permissions
-    string who;
-    int ch_field = 0;
-    for(int i = 0; i<9; i++)
-    {
-        if(ch_field == 0)
-            who = "User";
-        else if(ch_field == 1)
-            who = "Group";
-        else
-            who = "Others";
-
-        string read = who + " has read permissions on oldfile: ";
-        write(1, read.c_str(), read.size());
-        oldfile[i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
-
-        string write_ = who + " has write permissions on oldfile: ";
-        write(1, write_.c_str(), write_.size());
-        oldfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
-
-        string execute = who + " has execute permissions on oldfile: ";
-        write(1, execute.c_str(), execute.size());
-        oldfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
-
-        ch_field++;
-    }
 
     //new file
-    ch_field = 0;
+    string who;
+    int ch_field = 0;
     for(int i = 0; i<9; i++)
     {
         if(ch_field == 0)
@@ -77,6 +52,33 @@ void permission_print(bool is_dir, bool is_verified, bool is_size_same, vector<b
         ch_field++;
     }
 
+    //old file permissions
+    ch_field = 0;
+    for(int i = 0; i<9; i++)
+    {
+        if(ch_field == 0)
+            who = "User";
+        else if(ch_field == 1)
+            who = "Group";
+        else
+            who = "Others";
+
+        string read = who + " has read permissions on oldfile: ";
+        write(1, read.c_str(), read.size());
+        oldfile[i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string write_ = who + " has write permissions on oldfile: ";
+        write(1, write_.c_str(), write_.size());
+        oldfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        string execute = who + " has execute permissions on oldfile: ";
+        write(1, execute.c_str(), execute.size());
+        oldfile[++i] ? write(1, "Yes\n", 4) : write(1, "No\n", 3);
+
+        ch_field++;
+    }
+
+    
 
     //dir
     ch_field = 0;
