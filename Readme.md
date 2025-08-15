@@ -1,32 +1,28 @@
-## AOS - Assignment 1
-# File Reversal in Different Modes 
+## File Reversal Utility
 language - C++
-
-# Submitted by
-Name - Anurag Kacholiya
-Roll No. - 2025202025 
-(M.tech - CSIS)
-__________________________________________________________________
 __________________________________________________________________
 
 # Overview
 This project implements file content reversal using system calls in C++ with multiple modes, as well as file and permission verification. The assignment consists of two parts:
 
-**Q1**: Reverse file contents in one of three modes:
+**Module 1**: Reverse file contents in one of three modes:
+1) **Block-wise reversal : (flag 0)** – reverse each block of fixed size individually.
+2) **Full file reversal : (flag 1)** – reverse the entire file as a whole.
+3) **Partial range reversal : (flag 2)** – reverse portions before and after a specified range, leaving the middle part intact.
 
-**Block-wise reversal : (flag 0)** – reverse each block of fixed size individually.
-**Full file reversal : (flag 1)** – reverse the entire file as a whole.
-**Partial range reversal : (flag 2)** – reverse portions before and after a specified range, leaving the middle part intact.
+**Module 2**: Verify the generated output file and directory for:
+1) Correct reversal pattern according to the flag used
+2) Matching file sizes
+3) Correct permissions for all newFile, oldFile and Directory.
 
-**Q2**: Verify the generated output file and directory for:
-
-Correct reversal pattern according to the flag used
-Matching file sizes
-Correct permissions for all newFile, oldFile and Directory.
+**Technical Guidelines :**
+1) Zero high-level I/O and shell commands, relying entirely on POSIX system call documentation (man pages).
+2) Low-level file handling concepts to process large files with memory constraints, ensuring correctness and robustness.(tested on 5GB files).
+3) Using only Linux system calls (read, write, lseek, stat, open, mkdir, etc.).
 __________________________________________________________________
 
 # Execution instructions
-**Q1**
+**Module 1**
 code compilation : g++ 2025202025_A1_Q1.cpp
 
 execution format for command line arguments : ./a.out <input file name> <flag> [<blockSize>|<start> <end>]
@@ -44,7 +40,7 @@ execution format for command line arguments : ./a.out <input file name> <flag> [
 **Output file for flag 2 :**  Assignment1/2_<input file name>
 __________________________________________________________________
 
-**Q2**
+**Module 2**
 code compilation : g++ 2025202025_A1_Q2.cpp
 
 execution format for command line arguments : ./a.out <newfilepath> <oldfilepath> <directory> <flag> [<blockSize>|<start> <end>]
@@ -58,7 +54,7 @@ execution format for command line arguments : ./a.out <newfilepath> <oldfilepath
 **Flag 2 :**
 **command :** ./a.out Assignment1/<newFile name> <oldFile name> Assignment1 2 <start index> <end index>
 
-**Output Format for Q2 :**
+**Output Format for Module 2 :**
 Directory is created: Yes
 Whether file contents are correctly processed: Yes
 Both Files Sizes are Same: Yes
